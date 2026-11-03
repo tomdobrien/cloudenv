@@ -12,9 +12,10 @@ its flat base at Z=0. It fits the X1C's 256 × 256 × 256 mm build volume.
 Keep the model at 100% scale to retain 1.4 mm letter strokes and 9.8 mm tall
 letters. The lettering projects 1.2 mm from the plaque surface.
 
-Revision 3 uses measured outlines from the approved gray concept image for
+Revision 4 uses measured outlines from the approved gray concept image for
 layered stepped hair, blunt bangs, uniform details and pixel facial features.
-The head is wider relative to the pedestal, and the plaque is taller. Depth,
+The cheeks and jaw are narrowed and angular. Two broad, tilted hair sections
+replace the repeated thin diagonal strips; the bangs are uneven and stepped. Depth,
 unseen sides and back are reconstructed; the result remains an approximation.
 The fixed visual target is `references/approved_gray_concept.png`; that file is
 a generated concept, not a mesh render. Use `models/actual_mesh_preview.png`

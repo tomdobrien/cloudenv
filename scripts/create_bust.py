@@ -54,8 +54,8 @@ patch([(295,843),(355,832),(355,852),(334,852),(334,879),(308,879),(308,905),(28
 patch([(710,786),(746,781),(746,814),(722,814),(722,846),(744,846),(744,877),(716,877),(716,855),(691,855),(691,883),(665,883),(665,914),(690,914),(690,943),(664,943),(664,964),(635,964),(635,935),(608,935),(608,906),(583,906),(583,880),(611,880),(611,852),(648,852),(648,825),(684,825),(684,805),(710,805)],-39,-15)
 # Large asymmetric head, deliberately flat across the face, with faceted cheeks.
 def make_head():
-    specs=[(97,20,-25,17),(103,29,-32,22),(114,39,-37,28),(132,46,-38,31),
-           (151,47,-38,33),(174,44,-35,32),(190,33,-24,29),(199,20,-11,22)]
+    specs=[(95,15,-26,14),(102,23,-33,19),(115,32,-37,24),(133,40,-38,28),
+           (151,43,-38,30),(174,40,-35,30),(190,31,-24,27),(199,18,-11,21)]
     vertices=[]
     for z,w,f,b in specs:
         center=-9
@@ -88,9 +88,9 @@ patch([(338,479),(359,479),(359,520),(379,520),(379,545),(402,545),(402,573),(42
 # Visible right ear, recessed stepped inner ear.
 ear=trace([(785,456),(831,453),(848,473),(848,526),(825,553),(783,553),(770,526),(770,478)],-4,17)
 ear=ear-trace([(799,478),(827,478),(827,509),(813,509),(813,533),(797,533),(797,513),(786,513),(786,493),(799,493)],-6,3)
-add(ear)
+add(ear.translate((-5,0,0)))
 # Rear scalp: enough round depth to be a complete bust from every side.
-add(rings([(163,51,-9,34),(184,62,-13,42),(202,47,-8,36),(214,25,0,24)]))
+add(rings([(163,44,-9,31),(184,53,-13,37),(202,43,-8,32),(214,22,0,21)]))
 # Hair silhouette is traced in layers. Each layer has substantial overlap into
 # the scalp/head so the print is a connected solid, with no dangling strands.
 hair=[
@@ -113,12 +113,36 @@ hair=[
 # Blunt sideburn behind the right ear.
 ([(814,550),(850,550),(850,601),(837,601),(837,655),(813,655),(813,610),(802,610),(802,577),(814,577)],2,27),
 ]
-# Broad swept backing plane joins the layers without deep checkerboard gaps.
-patch([(378,94),(442,63),(513,63),(653,120),(770,210),(899,345),
-       (930,410),(857,410),(748,361),(630,307),(517,245),(415,189),(376,161)],-40,-3)
-for poly,f,b in hair:
-    if f == -35: f=-42
-    patch(poly,f,b)
+# Replace the repetitive thin diagonal strips with two broad swept masses.
+# Stepped outlines remain, while tilted front planes give each lock volume.
+for i,(poly,f,b) in enumerate(hair):
+    if i in (2,9): continue
+    if i == 4:  # thinner central fringe, off-center and irregular
+        poly=[(408,178),(448,178),(448,276),(457,276),(457,356),
+              (465,356),(465,479),(438,479),(438,429),(425,429),
+              (425,354),(416,354),(416,277),(402,277),(402,221),(408,221)]
+    if i == 6:  # broader right lock, only two large steps
+        poly=[(579,303),(637,303),(637,391),(651,391),(651,526),
+              (618,526),(618,460),(600,460),(600,383),(579,383)]
+    if i == 10:
+        add(trace(poly,f,b).translate((-6,0,0)))
+    else:
+        patch(poly,f,b)
+# Crown layers meet the scalp continuously instead of leaving square slots.
+upper=[(375,94),(435,62),(513,62),(550,93),(578,120),(641,130),
+ (680,169),(730,182),(762,219),(808,233),(840,270),(879,292),
+ (901,331),(930,360),(930,391),(878,376),(835,337),(783,311),
+ (748,274),(691,254),(648,217),(590,197),(548,163),(488,149),
+ (435,128),(375,128)]
+main=[(392,114),(480,122),(510,180),(585,185),(625,235),(704,240),
+ (744,293),(816,299),(850,349),(907,355),(931,405),(845,405),
+ (814,371),(742,371),(709,328),(639,328),(605,282),(534,282),
+ (508,237),(454,237),(435,191),(398,178)]
+# A solid swept core prevents open-looking slots between the broad layers.
+add(hull([((x-580)*.18,y,(1270-py)*.175)
+          for x,py in upper+main for y in (-42.8,-7.8)]).scale((1.001,1,1.001)))
+add(trace(upper,-34,22).transform([[1,0,0,0],[0,1,.055,-9],[0,0,1,0]]))
+add(trace(main,-46,0).transform([[1,0,0,0],[0,1,.08,-14],[0,0,1,0]]))
 # Rear hair is faceted, not an open extruded plate.
 for x,z,w in [(-51,149,16),(-32,145,20),(-12,142,22),(10,144,22),(30,151,20),(48,160,16)]:
     add(box(x,29,(z+184)/2,w,22,184-z))
