@@ -13,8 +13,8 @@ obj.data.materials.append(mat)
 bpy.ops.mesh.primitive_plane_add(size=2000,location=(0,0,-.2))
 floor=bpy.data.materials.new('Warm studio');floor.diffuse_color=(.25,.22,.20,1);bpy.context.object.data.materials.append(floor)
 def aim(o,p):o.rotation_euler=(Vector(p)-o.location).to_track_quat('-Z','Y').to_euler()
-bpy.ops.object.camera_add(location=(60,-700,230));cam=bpy.context.object;aim(cam,(0,0,110));cam.data.type='ORTHO';cam.data.ortho_scale=260;bpy.context.scene.camera=cam
+bpy.ops.object.camera_add(location=(55,-700,178));cam=bpy.context.object;aim(cam,(0,0,110));cam.data.type='ORTHO';cam.data.ortho_scale=260;bpy.context.scene.camera=cam
 for loc,power,size in [((-230,-350,440),1200000,260),((270,-80,230),500000,220),((0,230,360),1000000,180)]:
  bpy.ops.object.light_add(type='AREA',location=loc);o=bpy.context.object;o.data.energy=power;o.data.shape='DISK';o.data.size=size;aim(o,(0,0,110))
-s=bpy.context.scene;s.render.engine='CYCLES';s.cycles.samples=32;s.cycles.use_denoising=False;s.render.resolution_x=900;s.render.resolution_y=1000;s.render.resolution_percentage=100
+s=bpy.context.scene;s.render.engine='CYCLES';s.cycles.samples=48;s.cycles.use_denoising=False;s.render.resolution_x=900;s.render.resolution_y=1000;s.render.resolution_percentage=100
 s.world.color=(.3,.3,.3);s.render.image_settings.file_format='PNG';s.render.filepath=str(ROOT/'models/actual_mesh_preview.png');bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'models/preview_scene.blend'));bpy.ops.render.render(write_still=True)

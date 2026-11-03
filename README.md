@@ -12,14 +12,13 @@ its flat base at Z=0. It fits the X1C's 256 × 256 × 256 mm build volume.
 Keep the model at 100% scale to retain 1.4 mm letter strokes and 9.8 mm tall
 letters. The lettering projects 1.2 mm from the plaque surface.
 
-Revision 4 uses measured outlines from the approved gray concept image for
-layered stepped hair, blunt bangs, uniform details and pixel facial features.
-The cheeks and jaw are narrowed and angular. Two broad, tilted hair sections
-replace the repeated thin diagonal strips; the bangs are uneven and stepped. Depth,
-unseen sides and back are reconstructed; the result remains an approximation.
-The fixed visual target is `references/approved_gray_concept.png`; that file is
-a generated concept, not a mesh render. Use `models/actual_mesh_preview.png`
-to judge what the STL actually contains.
+Revision 5 uses the approved gray concept as its visual target, with a directly
+traced front jaw/cheek outline, individually shaped broad hair locks, and
+connected hair roots. The camera is closer to the concept's frontal viewpoint.
+The result is still a reconstruction, not an exact conversion of the image.
+Depth, unseen sides and back are inferred. The fixed target is
+`references/approved_gray_concept.png`; that image is a generated concept.
+Use `models/actual_mesh_preview.png` to judge the actual STL geometry.
 
 The STL is one connected, closed solid. It contains no color information;
 use a single filament. `models/actual_mesh_preview.png` is rendered from the

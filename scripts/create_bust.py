@@ -29,8 +29,6 @@ def trace(poly,front,back):
     return profile([((x-580)*.18,(1270-y)*.175) for x,y in poly],front,back)
 def patch(poly,front,back):
     solid=trace(poly,front,back)
-    if min(y for x,y in poly)>775:
-        solid=solid.transform([[1,0,0,0],[0,1,.20,-9],[0,0,1,0]])
     add(solid)
 # Wide plinth and deep inset-looking dialogue panel.
 add(box(0,0,20,190,100,40))
@@ -38,7 +36,7 @@ add(box(0,-50.7,20,180,2,33))
 for x in [-89,89]:add(box(x,-52,20,1.5,1.4,32))
 for z in [4.5,35.5]:add(box(0,-52,z,179,1.4,1.5))
 # Shoulders follow the approved silhouette; depth tapers toward the neck.
-add(rings([(39,85,-38,34),(60,83,-37,33),(71,65,-27,30),(82,34,-19,24)]))
+add(rings([(39,85,-34,34),(61,83,-33,33),(77,65,-30,30),(91,34,-28,24)]))
 add(rings([(76,27,-12,23),(105,26,-15,24),(124,27,-17,25)]))
 # Tall SeeD uniform collar, with thick stepped upper trim.
 patch([(346,736),(407,746),(407,798),(379,805),(379,833),(337,825)],-39,-10)
@@ -52,25 +50,18 @@ patch([(809,884),(902,861),(1035,848),(1035,867),(914,880),(914,897),(809,914)],
 # Blocky ceremonial chest emblems, tracing the chunky approved design.
 patch([(295,843),(355,832),(355,852),(334,852),(334,879),(308,879),(308,905),(287,905),(287,946),(264,946),(264,921),(240,921),(240,894),(271,894),(271,867),(295,867)],-40,-20)
 patch([(710,786),(746,781),(746,814),(722,814),(722,846),(744,846),(744,877),(716,877),(716,855),(691,855),(691,883),(665,883),(665,914),(690,914),(690,943),(664,943),(664,964),(635,964),(635,935),(608,935),(608,906),(583,906),(583,880),(611,880),(611,852),(648,852),(648,825),(684,825),(684,805),(710,805)],-39,-15)
-# Large asymmetric head, deliberately flat across the face, with faceted cheeks.
-def make_head():
-    specs=[(95,15,-26,14),(102,23,-33,19),(115,32,-37,24),(133,40,-38,28),
-           (151,43,-38,30),(174,40,-35,30),(190,31,-24,27),(199,18,-11,21)]
-    vertices=[]
-    for z,w,f,b in specs:
-        center=-9
-        vertices.extend([(center-w*.70,f,z),(center+w*.45,f,z),(center+w*.83,f+8,z),
-         (center+w,f+22,z),(center+w*.93,b-8,z),(center+w*.5,b,z),
-         (center-w*.5,b,z),(center-w*.94,b-8,z),(center-w,f+16,z),(center-w*.88,f+4,z)])
-    faces=[]
-    for j in range(len(specs)-1):
-        for i in range(10):
-            a=j*10+i;b=j*10+(i+1)%10;c=(j+1)*10+(i+1)%10;d=(j+1)*10+i
-            faces.extend([(a,b,c),(a,c,d)])
-    for i in range(1,9):faces.extend([(0,i+1,i),(70,70+i,70+i+1)])
-    mesh=tm.Trimesh(vertices,faces,process=True);mesh.fix_normals()
-    return m.Manifold(m.Mesh(np.array(mesh.vertices,np.float32),np.array(mesh.faces,np.uint32)))
-head=make_head()
+# The front cheek/jaw outline is traced directly from the approved concept.
+# A shallow stepped front joins a deeper faceted right cheek and rounded back.
+face_outline=[(343,278),(550,278),(585,316),(603,399),(610,491),
+ (638,524),(684,529),(684,631),(608,706),(414,706),(340,606),
+ (340,522),(323,522),(323,446),(340,446)]
+head=trace(face_outline,-38,-11)
+# Broad side cheek: shared edge embeds in the face plate; rear profile supplies
+# genuine head depth instead of leaving a relief with an open back.
+head=head+hull([((x-580)*.18,y,(1270-py)*.175) for x,py,y in [
+ (540,280,-16),(675,303,-12),(771,346,2),(788,474,4),(756,583,2),
+ (608,706,-26),(413,705,-26),(341,603,-28),(343,280,-28),
+ (420,315,28),(658,320,31),(730,449,31),(691,600,29),(508,680,20)]])
 # Square pixel eyes and the small block mouth are shallow recesses, not paint.
 for poly in [[(348,421),(428,421),(428,445),(347,445)],[(492,424),(563,424),(563,447),(492,447)],
              [(438,602),(532,602),(532,628),(438,628)],[(440,549),(487,549),(487,568),(440,568)]]:
@@ -81,10 +72,6 @@ for px in [388,524]:
     add(box((px-580)*.18,-35.8,(1270-436)*.175,4.5,3.2,3.8))
 patch([(341,400),(424,400),(424,420),(341,420)],-39.5,-33)
 patch([(494,406),(566,406),(566,424),(494,424)],-39.5,-33)
-# A tiny two-step nose projects above the pixel nostril.
-patch([(461,468),(484,468),(484,514),(498,514),(498,537),(447,537),(447,521),(461,521)],-40,-33)
-# Face pixel steps are low-relief surface facets, not decorative surface texture.
-patch([(338,479),(359,479),(359,520),(379,520),(379,545),(402,545),(402,573),(424,573),(424,596),(405,596),(405,582),(383,582),(383,553),(360,553),(360,527),(338,527)],-36.2,-31)
 # Visible right ear, recessed stepped inner ear.
 ear=trace([(785,456),(831,453),(848,473),(848,526),(825,553),(783,553),(770,526),(770,478)],-4,17)
 ear=ear-trace([(799,478),(827,478),(827,509),(813,509),(813,533),(797,533),(797,513),(786,513),(786,493),(799,493)],-6,3)
@@ -113,36 +100,47 @@ hair=[
 # Blunt sideburn behind the right ear.
 ([(814,550),(850,550),(850,601),(837,601),(837,655),(813,655),(813,610),(802,610),(802,577),(814,577)],2,27),
 ]
-# Replace the repetitive thin diagonal strips with two broad swept masses.
-# Stepped outlines remain, while tilted front planes give each lock volume.
+# Major locks follow the individual broad shapes in the approved render.
+# Front-to-back overlap is explicit, so separate layers remain visually legible.
 for i,(poly,f,b) in enumerate(hair):
-    if i in (2,9): continue
-    if i == 4:  # thinner central fringe, off-center and irregular
-        poly=[(408,178),(448,178),(448,276),(457,276),(457,356),
-              (465,356),(465,479),(438,479),(438,429),(425,429),
-              (425,354),(416,354),(416,277),(402,277),(402,221),(408,221)]
-    if i == 6:  # broader right lock, only two large steps
-        poly=[(579,303),(637,303),(637,391),(651,391),(651,526),
-              (618,526),(618,460),(600,460),(600,383),(579,383)]
-    if i == 10:
-        add(trace(poly,f,b).translate((-6,0,0)))
-    else:
-        patch(poly,f,b)
-# Crown layers meet the scalp continuously instead of leaving square slots.
-upper=[(375,94),(435,62),(513,62),(550,93),(578,120),(641,130),
- (680,169),(730,182),(762,219),(808,233),(840,270),(879,292),
- (901,331),(930,360),(930,391),(878,376),(835,337),(783,311),
- (748,274),(691,254),(648,217),(590,197),(548,163),(488,149),
- (435,128),(375,128)]
-main=[(392,114),(480,122),(510,180),(585,185),(625,235),(704,240),
- (744,293),(816,299),(850,349),(907,355),(931,405),(845,405),
- (814,371),(742,371),(709,328),(639,328),(605,282),(534,282),
- (508,237),(454,237),(435,191),(398,178)]
-# A solid swept core prevents open-looking slots between the broad layers.
-add(hull([((x-580)*.18,y,(1270-py)*.175)
-          for x,py in upper+main for y in (-42.8,-7.8)]).scale((1.001,1,1.001)))
-add(trace(upper,-34,22).transform([[1,0,0,0],[0,1,.055,-9],[0,0,1,0]]))
-add(trace(main,-46,0).transform([[1,0,0,0],[0,1,.08,-14],[0,0,1,0]]))
+    if i in (0,2,4,6,7,8,9): continue
+    if i==10:add(trace(poly,f,b).translate((-6,0,0)))
+    else:patch(poly,f,b)
+# Stepped cap: three large overlapping clumps with sloping front planes.
+cap=[(437,10),(616,10),(636,55),(670,55),(704,95),(768,95),
+ (794,135),(849,135),(875,190),(894,246),(894,301),(852,301),
+ (852,258),(799,258),(768,210),(708,210),(685,165),(622,165),
+ (595,122),(536,122),(511,83),(437,83)]
+left_cap=[(376,46),(435,46),(435,85),(503,85),(503,129),(441,129),
+ (441,169),(377,169),(377,210),(314,210),(314,253),(246,282),
+ (217,282),(230,229),(270,198),(270,167),(311,167),(311,101),(365,101)]
+right_cap=[(794,260),(853,260),(853,307),(900,307),(900,348),
+ (924,348),(924,397),(952,397),(952,448),(975,448),(975,512),
+ (946,512),(946,480),(907,480),(907,450),(862,450),(862,413),
+ (812,413),(812,370),(784,370)]
+patch(cap,-24,35);patch(left_cap,-31,28);patch(right_cap,-15,30)
+# Forehead bangs, deliberately blunt and thick, rather than thin zigzag ribbons.
+patch([(405,195),(460,195),(460,322),(487,322),(487,449),
+ (489,449),(489,493),(447,493),(447,449),(427,449),(427,356),(405,356)],-45,-6)
+patch([(559,302),(608,302),(608,409),(632,409),(632,635),
+ (606,635),(606,529),(585,529),(585,400),(559,400)],-43,0)
+patch([(653,377),(710,377),(710,449),(758,449),(758,554),
+ (691,554),(691,495),(675,495),(675,429),(653,429)],-39,12)
+# Hair-root mass embeds the broad locks, closing the large artificial slots.
+patch([(300,210),(480,110),(650,200),(830,350),(770,390),(680,330),
+ (590,285),(515,250),(430,220),(360,280),(300,350)],-40.1,-5)
+# A single generous swept front lock: large angled planes and a few broad steps.
+main=[(442,116),(521,124),(556,173),(624,180),(650,222),
+ (714,229),(742,268),(800,275),(828,319),(847,375),
+ (764,372),(740,340),(682,338),(655,301),(591,297),
+ (566,271),(510,244),(469,202)]
+# Second sweep behind it is offset upward, providing the layered silhouette.
+upper=[(398,84),(501,84),(544,115),(610,117),(647,153),(710,157),
+ (746,193),(798,199),(832,238),(855,276),(893,300),(848,301),
+ (813,270),(750,266),(713,226),(650,224),(615,186),(552,184),
+ (520,147),(461,147),(432,118),(398,118)]
+patch(upper,-36,14)
+patch(main,-48,-4)
 # Rear hair is faceted, not an open extruded plate.
 for x,z,w in [(-51,149,16),(-32,145,20),(-12,142,22),(10,144,22),(30,151,20),(48,160,16)]:
     add(box(x,29,(z+184)/2,w,22,184-z))
