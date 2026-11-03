@@ -1,6 +1,8 @@
 # Pixel Squall bust for Bambu Lab X1 Carbon
 
-A single-color, low-resolution Squall-inspired bust with the inscription
+A single-color, low-resolution Squall-inspired bust rebuilt around the source
+portrait: swept tapered hair, visible forehead, a narrower angular jaw, small
+slanted eyes, and a closed mouth. The base carries the inscription
 “You’re the best looking guy here” in raised pixel lettering.
 
 ## Print file
@@ -10,6 +12,9 @@ The file is **190 × 102.9 × 216 mm** (width × depth × height), upright with
 its flat base at Z=0. It fits the X1C's 256 × 256 × 256 mm build volume.
 Keep the model at 100% scale to retain 1.4 mm letter strokes and 9.8 mm tall
 letters. The lettering projects 1.2 mm from the plaque surface.
+
+Revision 2 replaces the first block-stack construction with faceted polygon
+sections and tapered hair locks.
 
 The STL is one connected, closed solid. It contains no color information;
 use a single filament. `models/actual_mesh_preview.png` is rendered from the
