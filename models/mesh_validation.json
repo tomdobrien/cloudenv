@@ -3,7 +3,7 @@
   "dimensions_xyz": [
     190.0,
     102.9000015258789,
-    216.0
+    220.5
   ],
   "bounds": [
     [
@@ -14,14 +14,14 @@
     [
       95.0,
       50.0,
-      216.0
+      220.5
     ]
   ],
-  "triangles": 6422,
+  "triangles": 6846,
   "watertight": true,
   "consistent_winding": true,
   "connected_components": 1,
-  "solid_volume_cm3": 1651.0386277874195,
+  "solid_volume_cm3": 2039.6882594832834,
   "letter_stroke_mm": 1.4,
   "letter_height_mm": 9.8,
   "text": "You\u2019re the best looking guy here"

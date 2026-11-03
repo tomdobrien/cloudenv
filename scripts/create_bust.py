@@ -20,52 +20,48 @@ def add(p):
     assert p.status()==m.Error.NoError, (len(parts),p.status())
     assert not p.is_empty(), len(parts)
     parts.append(p);return p
-# Broad pedestal and framed PS1 dialogue plaque.
-add(box(0,0,16,190,100,32))
-add(box(0,-50.7,16,180,2,26))
-for x in [-89,89]:add(box(x,-52,16,1.5,1.4,25))
-for z in [4,28]:add(box(0,-52,z,179,1.4,1.5))
-# Polygonal forms follow the PS1 portrait, with swept tapered hair rather
-# than stacked cubes. X is horizontal, negative Y faces the viewer, Z is up.
-def profile(poly, front, back):
-    if sum(a[0]*b[1]-b[0]*a[1] for a,b in zip(poly,poly[1:]+poly[:1]))<0: poly=list(reversed(poly))
+# Model coordinates are millimetres. The front is negative Y.
+# Image-space outlines refer to the approved 1199 x 1312 gray concept.
+def profile(poly,front,back):
+    if sum(a[0]*b[1]-b[0]*a[1] for a,b in zip(poly,poly[1:]+poly[:1]))<0:poly=list(reversed(poly))
     return m.CrossSection([poly]).extrude(back-front).rotate((90,0,0)).translate((0,back,0))
-def ribbon(sections):
-    """Faceted tapered lock with a shallow central ridge; connected segments."""
-    solids=[]
-    for a,b in zip(sections,sections[1:]):
-        pts=[]
-        for x,z,w,y,depth in (a,b):
-            pts.extend([(x-w/2,y+2,z),(x,y-2,z),(x+w/2,y+2,z),
-                        (x-w/2,y+depth,z),(x+w/2,y+depth,z)])
-        solids.append(hull(pts))
-    return m.Manifold.batch_boolean(solids,m.OpType.Add)
-# Broader, higher shoulders; cropped ceremonial uniform with an angled collar.
-add(rings([(31,86,-39,35),(48,86,-38,34),(69,68,-29,29),(84,33,-19,24)]))
-add(rings([(67,23,-15,22),(111,23,-17,24),(127,26,-21,24)]))
-for side in [-1,1]:
-    poly=[(side*9,70),(side*34,77),(side*33,103),(side*10,96)]
-    add(profile(poly,-27,-14))
-    add(ribbon([(side*10,96,4,-29,6),(side*23,100,4,-27,6),(side*33,103,4,-25,6)]))
-    # Trim follows the sloping shoulder instead of hanging ahead of it.
-    add(profile([(side*39,61),(side*79,48),(side*83,44),(side*40,57)],-39,-18))
-    # Small connected polygon insignia, intentionally coarse like the screenshot.
-    poly=[(side*35,78),(side*32,72),(side*36,67),(side*43,64),(side*39,60),
-          (side*43,55),(side*38,51),(side*32,56),(side*30,63),(side*25,67),
-          (side*29,72),(side*29,79)]
-    add(profile(poly,-35,-21))
-add(profile([(-3,32),(1,32),(5,77),(1,80)],-40,-25))
-# Head built from explicit cross-sections, retaining flat PS1-style cheek planes.
-# No global convex hull: the inset temples and jaw remain distinct.
-def head_mesh():
-    specs=[(107,12,-23,12),(112,22,-30,19),(123,30,-34,25),
-           (138,36,-35,29),(155,37,-35,30),(173,35,-33,30),
-           (188,31,-28,28),(198,19,-15,21)]
+def trace(poly,front,back):
+    return profile([((x-580)*.18,(1270-y)*.175) for x,y in poly],front,back)
+def patch(poly,front,back):
+    solid=trace(poly,front,back)
+    if min(y for x,y in poly)>775:
+        solid=solid.transform([[1,0,0,0],[0,1,.20,-9],[0,0,1,0]])
+    add(solid)
+# Wide plinth and deep inset-looking dialogue panel.
+add(box(0,0,20,190,100,40))
+add(box(0,-50.7,20,180,2,33))
+for x in [-89,89]:add(box(x,-52,20,1.5,1.4,32))
+for z in [4.5,35.5]:add(box(0,-52,z,179,1.4,1.5))
+# Shoulders follow the approved silhouette; depth tapers toward the neck.
+add(rings([(39,85,-38,34),(60,83,-37,33),(71,65,-27,30),(82,34,-19,24)]))
+add(rings([(76,27,-12,23),(105,26,-15,24),(124,27,-17,25)]))
+# Tall SeeD uniform collar, with thick stepped upper trim.
+patch([(346,736),(407,746),(407,798),(379,805),(379,833),(337,825)],-39,-10)
+patch([(606,758),(698,735),(701,713),(837,695),(837,810),(739,837),(739,849),(608,865)],-37,-7)
+patch([(343,730),(407,742),(407,757),(344,746)],-41,-12)
+patch([(606,756),(700,731),(700,709),(837,690),(837,707),(715,724),(715,746),(606,772)],-39,-8)
+# Center opening, placket and shoulder trim are shallow solid relief.
+patch([(475,811),(512,815),(512,852),(533,852),(533,977),(499,977),(499,881),(475,881)],-39,-17)
+patch([(153,901),(219,883),(219,868),(284,854),(284,870),(233,884),(233,899),(153,919)],-39,-10)
+patch([(809,884),(902,861),(1035,848),(1035,867),(914,880),(914,897),(809,914)],-38,-6)
+# Blocky ceremonial chest emblems, tracing the chunky approved design.
+patch([(295,843),(355,832),(355,852),(334,852),(334,879),(308,879),(308,905),(287,905),(287,946),(264,946),(264,921),(240,921),(240,894),(271,894),(271,867),(295,867)],-40,-20)
+patch([(710,786),(746,781),(746,814),(722,814),(722,846),(744,846),(744,877),(716,877),(716,855),(691,855),(691,883),(665,883),(665,914),(690,914),(690,943),(664,943),(664,964),(635,964),(635,935),(608,935),(608,906),(583,906),(583,880),(611,880),(611,852),(648,852),(648,825),(684,825),(684,805),(710,805)],-39,-15)
+# Large asymmetric head, deliberately flat across the face, with faceted cheeks.
+def make_head():
+    specs=[(97,20,-25,17),(103,29,-32,22),(114,39,-37,28),(132,46,-38,31),
+           (151,47,-38,33),(174,44,-35,32),(190,33,-24,29),(199,20,-11,22)]
     vertices=[]
     for z,w,f,b in specs:
-        vertices.extend([(-w*.48,f,z),(w*.48,f,z),(w*.84,f+4,z),
-         (w,f+16,z),(w*.92,b-7,z),(w*.5,b,z),(-w*.5,b,z),
-         (-w*.92,b-7,z),(-w,f+16,z),(-w*.84,f+4,z)])
+        center=-9
+        vertices.extend([(center-w*.70,f,z),(center+w*.45,f,z),(center+w*.83,f+8,z),
+         (center+w,f+22,z),(center+w*.93,b-8,z),(center+w*.5,b,z),
+         (center-w*.5,b,z),(center-w*.94,b-8,z),(center-w,f+16,z),(center-w*.88,f+4,z)])
     faces=[]
     for j in range(len(specs)-1):
         for i in range(10):
@@ -74,51 +70,58 @@ def head_mesh():
     for i in range(1,9):faces.extend([(0,i+1,i),(70,70+i,70+i+1)])
     mesh=tm.Trimesh(vertices,faces,process=True);mesh.fix_normals()
     return m.Manifold(m.Mesh(np.array(mesh.vertices,np.float32),np.array(mesh.faces,np.uint32)))
-head=head_mesh()
-# Narrow slanted eyes and a small closed mouth: avoid rectangular robot sockets.
-for side in [-1,1]:
-    eye=[(side*8,155),(side*14,156),(side*26,154),(side*26,151),(side*17,150),(side*9,151)]
-    head=head-profile(eye,-40,-32.7)
-# Deliberately uneven closed-mouth line seen in the reference.
-head=head-profile([(-12,125),(-5,126),(2,125.5),(10,126),(12,124),
-                   (4,123),(-3,124),(-11,123.5)],-38,-32.4)
+head=make_head()
+# Square pixel eyes and the small block mouth are shallow recesses, not paint.
+for poly in [[(348,421),(428,421),(428,445),(347,445)],[(492,424),(563,424),(563,447),(492,447)],
+             [(438,602),(532,602),(532,628),(438,628)],[(440,549),(487,549),(487,568),(440,568)]]:
+    head=head-trace(poly,-43,-34.5)
 add(head)
-# Angular eyelids, pupils at the back of the recess, restrained eyebrows.
-for side in [-1,1]:
-    add(profile([(side*8,157),(side*15,158),(side*27,156),(side*26,154),(side*15,156),(side*8,155)],-35.5,-30))
-    add(box(side*17,-33,153,3.8,1.3,3.5))
-# Small nose bridge and a short angular tip; no giant triangular nose.
-add(hull([(-3,-34,155),(3,-34,155),(-4,-35,139),(4,-35,139),
-          (-3,-40,137),(3,-40,137),(0,-42,139)]))
-add(hull([(-6,-32,137),(6,-32,137),(-5,-39,135),(5,-39,135),(0,-41,137)]))
-# Slight lower-lip plane and chin, both shallow enough to retain the crude face.
-add(profile([(-9,121.5),(7,121.5),(9,120),(-7,119.5)],-35.5,-32))
-for side in [-1,1]:
-    ear=profile([(side*33,152),(side*42,155),(side*44,149),(side*42,136),(side*35,134)],-7,10)
-    ear=ear-profile([(side*38,148),(side*41,149),(side*40,140),(side*38,139)],-9,-3)
-    add(ear)
-# Faceted scalp, asymmetric off-center peak and fuller swept right side.
-add(rings([(171,37,-23,32),(190,44,-28,37),(205,35,-18,31),(216,13,-2,16)]))
-# Low-poly back locks hug the head rather than forming a cubic helmet.
-for x,top,bottom in [(-38,193,133),(-27,204,128),(-12,211,130),(6,211,126),(24,204,135),(37,192,142)]:
-    add(ribbon([(x,top,19,18,15),(x*1.08,(top+bottom)/2,18,27,13),(x*1.02,bottom,7,23,11)]))
-# Main swept masses traced from the crown down toward the right temple.
-# Broad sloping bands are the most distinctive feature of the source silhouette.
-for sections in [
- [(-12,211,23,-15,18),(2,205,28,-29,20),(21,195,28,-34,21),(37,182,23,-29,20),(48,169,7,-18,18)],
- [(-19,204,17,-24,16),(-1,196,24,-37,19),(17,187,24,-40,20),(34,175,16,-34,19),(45,162,4,-22,18)],
- [(-4,216,20,-7,18),(14,209,24,-19,19),(30,198,22,-22,19),(43,184,14,-18,17),(49,174,5,-9,16)],
- [(-24,204,16,-20,17),(-36,192,18,-27,19),(-45,175,15,-23,18),(-46,158,8,-13,18)],
- [(-33,188,16,-30,19),(-42,170,13,-28,18),(-44,149,9,-17,18),(-43,124,5,-6,16)],
-]:add(ribbon(sections))
-# A few long, pointed bangs, with open forehead visible between them.
-for sections in [
- [(-12,204,13,-30,18),(-10,184,10,-37,17),(-8,164,7,-39,13),(-7,148,4,-38,10)],
- [(-24,196,12,-29,18),(-29,181,10,-36,17),(-30,164,5,-36,12)],
- [(3,193,12,-36,19),(8,178,10,-40,16),(10,164,4,-39,11)],
- [(23,184,14,-34,19),(29,163,10,-37,17),(26,142,6,-36,13),(25,125,3.5,-30,13)],
- [(39,176,11,-22,20),(41,158,8,-23,19),(39,144,4,-17,17)]
-]:add(ribbon(sections))
+# Inset pupils with a broad flat upper eyelid.
+for px in [388,524]:
+    add(box((px-580)*.18,-35.8,(1270-436)*.175,4.5,3.2,3.8))
+patch([(341,400),(424,400),(424,420),(341,420)],-39.5,-33)
+patch([(494,406),(566,406),(566,424),(494,424)],-39.5,-33)
+# A tiny two-step nose projects above the pixel nostril.
+patch([(461,468),(484,468),(484,514),(498,514),(498,537),(447,537),(447,521),(461,521)],-40,-33)
+# Face pixel steps are low-relief surface facets, not decorative surface texture.
+patch([(338,479),(359,479),(359,520),(379,520),(379,545),(402,545),(402,573),(424,573),(424,596),(405,596),(405,582),(383,582),(383,553),(360,553),(360,527),(338,527)],-36.2,-31)
+# Visible right ear, recessed stepped inner ear.
+ear=trace([(785,456),(831,453),(848,473),(848,526),(825,553),(783,553),(770,526),(770,478)],-4,17)
+ear=ear-trace([(799,478),(827,478),(827,509),(813,509),(813,533),(797,533),(797,513),(786,513),(786,493),(799,493)],-6,3)
+add(ear)
+# Rear scalp: enough round depth to be a complete bust from every side.
+add(rings([(163,51,-9,34),(184,62,-13,42),(202,47,-8,36),(214,25,0,24)]))
+# Hair silhouette is traced in layers. Each layer has substantial overlap into
+# the scalp/head so the print is a connected solid, with no dangling strands.
+hair=[
+# Back/top silhouette, with the large 3-4 mm steps from the concept.
+([(245,201),(273,201),(273,150),(319,150),(319,103),(375,103),(375,52),(438,52),(438,10),(529,10),(529,39),(591,39),(591,65),(653,65),(653,93),(717,93),(717,122),(770,122),(770,164),(814,164),(814,202),(856,202),(856,253),(900,253),(900,299),(934,299),(934,360),(964,360),(964,443),(979,443),(979,507),(947,507),(947,472),(913,472),(913,448),(863,448),(863,408),(245,408)],-25,34),
+# Left outer fringe silhouette extends down to jaw height.
+([(273,163),(337,163),(337,237),(309,237),(309,298),(285,298),(285,362),(259,362),(259,424),(282,424),(282,485),(302,485),(302,556),(284,556),(284,610),(301,610),(301,684),(258,684),(258,623),(234,623),(234,555),(224,555),(224,490),(201,490),(201,410),(218,410),(218,342),(192,342),(192,278),(217,278),(217,222),(245,222),(245,190),(273,190)],-18,20),
+# Crown ridge, behind the main sweep.
+([(378,94),(442,94),(442,63),(513,63),(513,89),(577,89),(577,120),(641,120),(641,149),(706,149),(706,181),(760,181),(760,219),(815,219),(815,257),(861,257),(861,302),(899,302),(899,345),(930,345),(930,385),(888,385),(888,360),(844,360),(844,327),(790,327),(790,289),(736,289),(736,251),(675,251),(675,212),(612,212),(612,181),(549,181),(549,151),(486,151),(486,129),(378,129)],-35,24),
+# Several distinct blunt, heavy vertical bangs.
+([(330,197),(390,197),(390,258),(367,258),(367,321),(345,321),(345,383),(323,383),(323,432),(290,432),(290,367),(307,367),(307,302),(320,302),(320,245),(330,245)],-38,-5),
+([(407,183),(449,183),(449,278),(460,278),(460,357),(474,357),(474,484),(431,484),(431,437),(414,437),(414,361),(403,361),(403,281),(390,281),(390,226),(407,226)],-43,-6),
+([(514,257),(558,257),(558,339),(575,339),(575,424),(548,424),(548,387),(530,387),(530,337),(514,337)],-41,-3),
+([(593,324),(640,324),(640,401),(662,401),(662,470),(651,470),(651,536),(623,536),(623,475),(607,475),(607,400),(593,400)],-45,4),
+([(664,385),(700,385),(700,467),(683,467),(683,536),(665,536),(665,605),(649,605),(649,635),(626,635),(626,576),(642,576),(642,511),(652,511),(652,445),(664,445)],-43,13),
+# Outside right bang, close to the ear.
+([(736,385),(783,385),(783,452),(772,452),(772,516),(748,516),(748,565),(720,565),(720,510),(727,510),(727,449),(736,449)],-33,19),
+# Principal diagonal sweep with the big stair-step edge from the approved bust.
+([(376,118),(450,118),(450,143),(517,143),(517,177),(578,177),(578,208),(644,208),(644,239),(711,239),(711,271),(769,271),(769,307),(820,307),(820,344),(867,344),(867,379),(905,379),(905,410),(857,410),(857,388),(804,388),(804,361),(748,361),(748,335),(689,335),(689,307),(630,307),(630,277),(572,277),(572,245),(517,245),(517,218),(465,218),(465,189),(415,189),(415,161),(376,161)],-46,-8),
+# Blunt sideburn behind the right ear.
+([(814,550),(850,550),(850,601),(837,601),(837,655),(813,655),(813,610),(802,610),(802,577),(814,577)],2,27),
+]
+# Broad swept backing plane joins the layers without deep checkerboard gaps.
+patch([(378,94),(442,63),(513,63),(653,120),(770,210),(899,345),
+       (930,410),(857,410),(748,361),(630,307),(517,245),(415,189),(376,161)],-40,-3)
+for poly,f,b in hair:
+    if f == -35: f=-42
+    patch(poly,f,b)
+# Rear hair is faceted, not an open extruded plate.
+for x,z,w in [(-51,149,16),(-32,145,20),(-12,142,22),(10,144,22),(30,151,20),(48,160,16)]:
+    add(box(x,29,(z+184)/2,w,22,184-z))
 # Original 5x7 pixel alphabet; thin strokes are 1.4mm wide and 1.2mm raised.
 FONT={
 'Y':['10001','10001','01010','00100','00100','00100','00100'],
@@ -149,18 +152,26 @@ def text(line,z):
             for col,b in enumerate(bits):
                 if b=='1':add(box(x+(col+.5)*pitch,-52.1,z+(3-row)*pitch,pitch+.015,1.6,pitch+.015))
         x+=(len(glyph[0])+1)*pitch
-text('You’re the best',21.4)
-text('looking guy here',10.2)
+text('You’re the best',27)
+text('looking guy here',12)
 print('Union',len(parts),'solids',flush=True)
 solid=m.Manifold.batch_boolean(parts,m.OpType.Add)
 assert solid.status()==m.Error.NoError,solid.status()
+solid=solid.simplify(0.0001)
 mesh=solid.to_mesh()
 out=tm.Trimesh(np.asarray(mesh.vert_properties)[:,:3],np.asarray(mesh.tri_verts),process=True)
 out.remove_unreferenced_vertices()
+print('Mesh checks:',out.is_watertight,out.is_winding_consistent,out.volume,flush=True)
 assert out.is_watertight and out.is_winding_consistent and out.volume>0
 components=out.split(only_watertight=False)
-print('Components:',[(c.volume,c.bounds.tolist()) for c in components],flush=True)
-assert len(components)==1, f'{len(components)} disconnected parts'
+# Fill tiny sealed internal pockets created where traced locks meet the scalp.
+# Keep every positive-volume exterior; never silently drop detached features.
+voids=[c for c in components if c.volume < 0]
+assert all(abs(c.volume)<10 for c in voids)
+components=[c for c in components if c.volume>0]
+if voids: out=tm.util.concatenate(components)
+print('Exterior components:',len(components),'filled tiny internal pockets:',len(voids),flush=True)
+assert len(components)==1, [(c.volume,c.bounds.tolist()) for c in components]
 ROOT.joinpath('models').mkdir(exist_ok=True)
 out.export(ROOT/'models/squall_pixel_bust.stl')
 report={'units':'mm','dimensions_xyz':out.extents.tolist(),'bounds':out.bounds.tolist(),'triangles':len(out.faces),'watertight':bool(out.is_watertight),'consistent_winding':bool(out.is_winding_consistent),'connected_components':len(components),'solid_volume_cm3':float(out.volume/1000),'letter_stroke_mm':1.4,'letter_height_mm':9.8,'text':'You’re the best looking guy here'}

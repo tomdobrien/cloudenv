@@ -1,20 +1,24 @@
 # Pixel Squall bust for Bambu Lab X1 Carbon
 
-A single-color, low-resolution Squall-inspired bust rebuilt around the source
-portrait: swept tapered hair, visible forehead, a narrower angular jaw, small
-slanted eyes, and a closed mouth. The base carries the inscription
+A single-color Squall Leonhart bust in his FFVIII SeeD formal uniform, with
+an intentionally pixelated appearance and the inscription
 “You’re the best looking guy here” in raised pixel lettering.
 
 ## Print file
 
 Open `models/squall_pixel_bust.stl` in Bambu Studio. Import in **millimetres**.
-The file is **190 × 102.9 × 216 mm** (width × depth × height), upright with
+The file is **190 × 102.9 × 220.5 mm** (width × depth × height), upright with
 its flat base at Z=0. It fits the X1C's 256 × 256 × 256 mm build volume.
 Keep the model at 100% scale to retain 1.4 mm letter strokes and 9.8 mm tall
 letters. The lettering projects 1.2 mm from the plaque surface.
 
-Revision 2 replaces the first block-stack construction with faceted polygon
-sections and tapered hair locks.
+Revision 3 uses measured outlines from the approved gray concept image for
+layered stepped hair, blunt bangs, uniform details and pixel facial features.
+The head is wider relative to the pedestal, and the plaque is taller. Depth,
+unseen sides and back are reconstructed; the result remains an approximation.
+The fixed visual target is `references/approved_gray_concept.png`; that file is
+a generated concept, not a mesh render. Use `models/actual_mesh_preview.png`
+to judge what the STL actually contains.
 
 The STL is one connected, closed solid. It contains no color information;
 use a single filament. `models/actual_mesh_preview.png` is rendered from the
