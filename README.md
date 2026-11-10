@@ -12,10 +12,11 @@ its flat base at Z=0. It fits the X1C's 256 × 256 × 256 mm build volume.
 Keep the model at 100% scale to retain 1.4 mm letter strokes and 9.8 mm tall
 letters. The lettering projects 1.2 mm from the plaque surface.
 
-Revision 6 uses the approved gray concept as its visual target, with a directly
-traced front jaw/cheek outline, individually shaped broad hair locks, and
-connected hair roots. The hair planes now slope through depth, and the collar
-has taller sides and an inset rim. The camera is closer to the concept's frontal viewpoint.
+Revision 7 refines the face and hair toward Squall's original FFVIII ballroom
+portrait: narrower stepped eyes, a smaller closed mouth, a shallow faceted nose,
+a less bulky hair sweep and crown, and thinner, uneven bangs. The long strand
+beside the cheek has a 3.1 mm wide tip. The bust retains the proportions and
+pixel styling developed from the approved gray concept.
 The result is still a reconstruction, not an exact conversion of the image.
 Depth, unseen sides and back are inferred. The fixed target is
 `references/approved_gray_concept.png`; that image is a generated concept.
